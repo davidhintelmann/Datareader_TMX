@@ -81,31 +81,55 @@ def get(market=str,ticker_symbol=str) -> pd.DataFrame:
 
 """
 Get stock price from TMX to compare to strike price
-from get() function
+can accept string or list of strings
 """
 def get_stock(ticker_symbol=str) -> pd.DataFrame:
     tmx = "https://m-x.ca/nego_cotes_en.php" # TMX website, where data is taken from
 
     #check that parameter is of type string
-    is_str1 = isinstance(ticker_symbol, str)
+    is_str1 = checktype(ticker_symbol) #isinstance(ticker_symbol, str)
     if not is_str1:
         raise TypeError("market parameter must be of type string")
 
     #download stock price, remember it is 15 minutes delayed
     try:
-        ticker_symbol = ticker_symbol.upper()
+        symbols = []
+        for n in ticker_symbol:
+            symbols.append(n.upper())
+
     except Exception as e:
         print(e)
     else:
-        URL = tmx + '?symbol=' + ticker_symbol + '*'
-        response = requests.get(URL)
-        soup = BeautifulSoup(response.text, 'html.parser')
-        x = soup.find('div', class_ = 'quote-info', attrs = 'ul')
-        y = x.ul.text.split('\n')[1:-2]
         price_dict = {}
-        for n in y:
-            key, value = n.split(':')
-            price_dict[key] = value
-        tmp_df = pd.DataFrame.from_dict(price_dict, orient='index').T
-        tmp_df.index = [ticker_symbol]
-        return tmp_df
+        is_list = isinstance(ticker_symbol, list)
+        if is_list:
+            df_list = []
+            for m in symbols:
+                URL = tmx + '?symbol=' + m + '*'
+                response = requests.get(URL)
+                soup = BeautifulSoup(response.text, 'html.parser')
+                x = soup.find('div', class_ = 'quote-info', attrs = 'ul')
+                y = x.ul.text.split('\n')[1:-2]
+
+                price_dict['TICKER'] = m
+                for z in y:
+                    key, value = z.split(':')
+                    price_dict[key] = value
+                tmp_df = pd.DataFrame.from_dict(price_dict, orient='index').T
+                df_list.append(tmp_df)
+            return pd.concat(df_list, ignore_index=True)
+        else:
+            ticker_symbol = ticker_symbol.upper()
+            URL = tmx + '?symbol=' + ticker_symbol + '*'
+            response = requests.get(URL)
+            soup = BeautifulSoup(response.text, 'html.parser')
+            x = soup.find('div', class_ = 'quote-info', attrs = 'ul')
+            y = x.ul.text.split('\n')[1:-2]
+
+            price_dict['TICKER'] = ticker_symbol
+            for z in y:
+                key, value = z.split(':')
+                price_dict[key] = value
+            tmp_df = pd.DataFrame.from_dict(price_dict, orient='index').T
+            return tmp_df
+            
