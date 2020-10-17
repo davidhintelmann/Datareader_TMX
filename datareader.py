@@ -25,7 +25,7 @@ def get_list(market=str) -> pd.DataFrame:
     except Exception as e:
         print(e)
     else:
-        if market == 'index' or 'etf':
+        if market == 'index' or market == 'etf':
             market = 0
         elif market == 'equity':
             market = 1
@@ -132,4 +132,6 @@ def get_stock(ticker_symbol=str) -> pd.DataFrame:
                 price_dict[key] = value
             tmp_df = pd.DataFrame.from_dict(price_dict, orient='index').T
             return tmp_df
-            
+
+def checktype(obj):
+    return bool(obj) and all(isinstance(elem, str) for elem in obj)
