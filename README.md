@@ -11,7 +11,7 @@ These prices are then displayed in a Pandas Dataframe for further analysis. This
 ---
 
 # Requirements  
-1. *Python* **3.8.5** (older version will work buy must be Python 3+)  
+1. *Python* **3.8.5** (older version will work but must be Python 3+)  
 2. *Pandas* **1.1.2** (older version will probably work)  
 3. *Requests* **2.23.0** (older version will probably work)  
 4. *bs4* **4.9.3** (for BeautifulSoup)  
