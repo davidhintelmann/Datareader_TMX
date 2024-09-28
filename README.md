@@ -1,3 +1,5 @@
+The `og` branch is the original code that was contained in this repo. Development for `main` and `dev` branch is focused towards updating dependencies/requirements.
+
 # Montreal Exchange (TMX) 
 
 The [Montreal Exchange](https://www.m-x.ca/accueil_en.php) is the oldest exchange in Canada and has a very important history to Canada's economy. Taken from Wikipedia,  
