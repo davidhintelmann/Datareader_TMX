@@ -1,4 +1,4 @@
-The `og` branch is the original code that was contained in this repo. Development for `main` and `dev` branch is focused towards updating dependencies/requirements.
+If you are looking for the original repo please checkout `og` branch.
 
 # Montreal Exchange (TMX) 
 
