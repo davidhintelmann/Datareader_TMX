@@ -13,10 +13,11 @@ These prices are then displayed in a Pandas Dataframe for further analysis. This
 ---
 
 # Requirements  
-1. *Python* **3.8.5** (older version will work but must be Python 3+)  
-2. *Pandas* **1.1.2** (older version will probably work)  
-3. *Requests* **2.23.0** (older version will probably work)  
-4. *bs4* **4.9.3** (for BeautifulSoup)  
+1. Python **3.11.5**
+2. Pandas **2.1.0** (older version will probably work)  
+3. Requests **2.31.0** (older version will probably work)  
+4. bs4 **4.12.2** (for BeautifulSoup)
+   - lxml **5.3.0** used with bs4 to process xml and html
 
 ---
 
