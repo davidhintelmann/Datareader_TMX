@@ -50,7 +50,7 @@ open interest
 implied volatility
 volume
 """
-def get(ticker_symbol=str) -> pd.DataFrame:
+def get_price(ticker_symbol=str) -> list[pd.DataFrame]:
     tmx = 'https://www.m-x.ca/en/trading/data/quotes' # TMX website, where data is taken from
 
     # check that both parameters are of type string
@@ -60,69 +60,28 @@ def get(ticker_symbol=str) -> pd.DataFrame:
 
     # now get data from https://www.m-x.ca/en/trading/data/quotes TMX website
     try:
+        price_dict = {}
         ticker_symbol = ticker_symbol.upper()
         url = tmx + '?symbol=' + ticker_symbol + '*#quotes'
         df = pd.read_html(url)[0].iloc[:-1] # do not include last row, rubbish information
+
+        # get metadata from the table at the top of page
+        response = requests.get(url)
+        soup = BeautifulSoup(response.text, 'html.parser')
+
+        last_update = soup.find('div', class_ = 'quote-info').find('p')
+        k, v = last_update.text.split(': ')
+        price_dict[k] = v
+        
+        x = soup.find('div', class_ = 'quote-info', attrs = 'ul')
+        y = x.ul.text.split('\n')[1:-1]
+
+        price_dict['TICKER'] = ticker_symbol
+        for z in y:
+            key, value = z.split(':')
+            price_dict[key] = value
+        meta_df = pd.DataFrame.from_dict(price_dict, orient='index').T
     except Exception as e:
         print(e)
     else:
-        return df[0].iloc[:-1] #do not include last row, rubbish information
-
-"""
-Get stock price from TMX to compare to strike price
-can accept string or list of strings
-
-!!! need to update function since tmx url has changed !!!
-"""
-def get_stock(ticker_symbol=str) -> pd.DataFrame:
-    tmx = 'https://www.m-x.ca/en/trading/data/quotes' # TMX website, where data is taken from
-
-    #check that parameter is of type string
-    is_str1 = checktype(ticker_symbol) #isinstance(ticker_symbol, str)
-    if not is_str1:
-        raise TypeError("market parameter must be of type string")
-
-    #download stock price, remember it is 15 minutes delayed
-    try:
-        symbols = []
-        for n in ticker_symbol:
-            symbols.append(n.upper())
-
-    except Exception as e:
-        print(e)
-    else:
-        price_dict = {}
-        is_list = isinstance(ticker_symbol, list)
-        if is_list:
-            df_list = []
-            for m in symbols:
-                URL = tmx + '?symbol=' + m + '*'
-                response = requests.get(URL)
-                soup = BeautifulSoup(response.text, 'html.parser')
-                x = soup.find('div', class_ = 'quote-info', attrs = 'ul')
-                y = x.ul.text.split('\n')[1:-2]
-
-                price_dict['TICKER'] = m
-                for z in y:
-                    key, value = z.split(':')
-                    price_dict[key] = value
-                tmp_df = pd.DataFrame.from_dict(price_dict, orient='index').T
-                df_list.append(tmp_df)
-            return pd.concat(df_list, ignore_index=True)
-        else:
-            ticker_symbol = ticker_symbol.upper()
-            URL = tmx + '?symbol=' + ticker_symbol + '*'
-            response = requests.get(URL)
-            soup = BeautifulSoup(response.text, 'html.parser')
-            x = soup.find('div', class_ = 'quote-info', attrs = 'ul')
-            y = x.ul.text.split('\n')[1:-2]
-
-            price_dict['TICKER'] = ticker_symbol
-            for z in y:
-                key, value = z.split(':')
-                price_dict[key] = value
-            tmp_df = pd.DataFrame.from_dict(price_dict, orient='index').T
-            return tmp_df
-
-def checktype(obj):
-    return bool(obj) and all(isinstance(elem, str) for elem in obj)
+        return meta_df, df
