@@ -1,0 +1,2 @@
+# ignore pycache from jupyter notebook while using vscode
+__pycache__
