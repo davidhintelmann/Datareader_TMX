@@ -64,6 +64,7 @@ def get_price(ticker_symbol=str) -> list[pd.DataFrame]:
         ticker_symbol = ticker_symbol.upper()
         url = tmx + '?symbol=' + ticker_symbol + '*#quotes'
         df = pd.read_html(url)[0].iloc[:-1] # do not include last row, rubbish information
+        df.rename(columns={'Unnamed: 0_level_0':'','Unnamed: 7_level_0':''}, inplace=True)
 
         # get metadata from the table at the top of page
         response = requests.get(url)
